@@ -4,17 +4,40 @@
     <title>演習課題5-2：外部APIの呼び出しテスト</title>
 </head>
 <body>
-    <h1 id="msg">何かのAPI</h1>
+    <h1 id="msg">書籍キーワード検索（国立国会図書館）API</h1>
     <form name="apiform"><p>
-        何かのフォーム：<input type="text" name="form_data">
-        <button type="button" id="btn1" onclick="some_api(this.form)">実行</button>
+        キーワード：<input type="text" name="form_data">
+        <button type="button" id="btn1" onclick="some_api(this.form)">検索</button>
     </p></form>
     
-    <div id="result"></div>
+    <div id="result">検索結果</div>
     <script>
         async function some_api(myForm) {
             // ここにコードを書く
-            document.getElementById("result").innerHTML += myForm.form_data.value+"<br />";
+            const keyword = myForm.form_data.value.trim();
+
+            if(!keyword) {
+                document.getElementById("result").innerText = "テキストを入力してください";
+                return;
+            }
+
+            const response = await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(keyword)}`);
+            
+            const data = await response.json();
+
+            if (!data.docs || data.docs.length === 0) {
+                document.getElementById("result").innerText = "該当する書籍がありません";
+                return;
+            }
+
+            let html = "";
+            data.docs.slice(0, 10).forEach(book => {
+                const title = book.title || "タイトル不明";
+                const author = book.author_name ? book.author_name.join(", ") : "著者不明";
+                html += `<p><strong>${title}</strong> 著者: ${author}</p>`;
+            });
+            
+            document.getElementById("result").innerHTML = html;
             document.apiform.reset();
         }
     </script>
