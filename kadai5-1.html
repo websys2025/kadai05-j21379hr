@@ -1,4 +1,4 @@
-<html lang="ja">
+<html <lang="ja">
 <head>
     <meta charset="utf-8">
     <title>演習課題5-1：郵便番号APIの呼び出しテスト</title>
@@ -15,8 +15,16 @@
         async function zip_api(myForm) {
             const endpoint = "https://zipcloud.ibsnet.co.jp/api/search";
             // ここにコードを書く
+            const zipcode = myForm.zipcode.value; 
+            const response = await fetch(`${endpoint}?zipcode=${zipcode}`);
+            const data = await response.json();
+            const result = data.results?.[0];
+
+            document.getElementById("result").innerHTML = result
+　            ? `住所：${result.address1} ${result.address2} ${result.address3}`
+　            : "住所が見つかりませんでした。";
             // zipcloudのAPI呼び出して結果を表示する
-            document.getElementById("result").innerHTML =  myForm.zipcode.value; // 現状ではそのまま表示しているだけ
+             // document.getElementById("result").innerHTML =  myForm.zipcode.value;
         }
     </script>
 </body>
